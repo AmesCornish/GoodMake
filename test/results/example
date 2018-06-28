@@ -1,0 +1,25 @@
++ ./example.sh all
+GoodMake version X.X.X
+Run src/list because it hasn't completed
++ ls src
++ read file
++ echo tgt/input.txt
++ read file
++ echo tgt/list
++ read file
+Run tgt/input.txt because it hasn't completed
++ basename tgt/input.txt
++ SRC=src/input.txt
++ ./example.sh src/input.txt
+GoodMake version X.X.X
+Dependency src/input.txt
++ sort src/input.txt
+Run tgt/list because it hasn't completed
++ basename tgt/list
++ SRC=src/list
++ ./example.sh src/list
+GoodMake version X.X.X
+Skip src/list because it was checked this build
++ sort src/list
+Skip all because dependencies unchanged
++ set +x

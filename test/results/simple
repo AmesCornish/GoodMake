@@ -1,0 +1,17 @@
++ ./make.sh tgt/sorted.txt
+GoodMake version X.X.X
+Run tgt/sorted.txt because it hasn't completed
+GoodMake version X.X.X
+Dependency src/input.txt
++ ./make.sh tgt/sorted.txt
+GoodMake version X.X.X
+Dependency src/input.txt
+Skip tgt/sorted.txt because dependencies unchanged
++ echo alfred
++ ./make.sh tgt/sorted.txt
+GoodMake version X.X.X
+Dependency src/input.txt
+Run tgt/sorted.txt because src/input.txt changed to 4442d1dd5310f01432dee95c7422c60c
+GoodMake version X.X.X
+Dependency src/input.txt
++ set +x

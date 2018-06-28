@@ -1,0 +1,3 @@
+(C) DEBUG output should show which recipe is executing, even for parallel exec.
+(C) Indent comments within subprocesses
+(C) More detail for circular dependency error message
