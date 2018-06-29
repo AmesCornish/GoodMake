@@ -8,7 +8,6 @@
     $0 results/parallel
     $0 results/errors
     $0 results/missing
-    rm -rf tgt src
 
 ##############################################
 
@@ -79,6 +78,7 @@
     set +x
     sync $1
     sed -i --file results.sed $1
+    rm -rf tgt src
 
 ##############################################
 ##############################################
