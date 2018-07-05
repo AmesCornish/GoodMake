@@ -9,16 +9,11 @@
 
 ############################################
 
-#! .day
-    period='yesterday'
-
-#! .hour
-    period='-1 hour'
-
-#! .day .hour
-    touch -d "$period" .$1_ago
-    [ $1 -nt .$1_ago ] || date>$1
-    rm $1_ago
+#! .minute .hour .day .week .month .year
+    period=${1#.}
+    touch -d "1 $period ago" $1.ago
+    [ $1 -nt $1.ago ] || date>$1
+    rm $1.ago
 
 #! .os_install
     date -r /var/log/installer/syslog > $1
