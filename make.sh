@@ -22,3 +22,9 @@
     # ./setup.py sdist bdist_wheel upload -r pypitest
     ./setup.py clean --all
     rm -rf *.egg-info
+
+#! dev-install
+    ./setup.py bdist_wheel
+    sudo ./setup.py install
+    ./setup.py clean --all
+    rm -rf *.egg-info
