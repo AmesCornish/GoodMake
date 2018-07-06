@@ -1,4 +1,4 @@
-#! /usr/local/bin/goodmake /bin/sh -se
+#! goodmake.py /bin/sh -se
 
 #! retest
     rm -rf test/results .test.gm

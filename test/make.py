@@ -1,4 +1,4 @@
-#! /usr/local/bin/goodmake /usr/bin/python3 -
+#! ../goodmake.py /usr/bin/python3 -
 
 #? tgt/*
     import subprocess

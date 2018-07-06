@@ -1,4 +1,4 @@
-#! /usr/local/bin/goodmake /bin/sh -se
+#! ../goodmake.py /bin/sh -se
 
 #? tgt/sorted.txt
     $0 src/input.txt

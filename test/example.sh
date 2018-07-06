@@ -1,4 +1,4 @@
-#! /usr/local/bin/goodmake /bin/sh -sex
+#! ../goodmake.py /bin/sh -sex
 
 
 # Default action is to sort all files in src directory

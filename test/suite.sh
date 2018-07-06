@@ -1,4 +1,4 @@
-#! /usr/local/bin/goodmake /bin/sh -se
+#! ../goodmake.py /bin/sh -se
 
 #? !default
     $0 results/example
