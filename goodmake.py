@@ -82,7 +82,7 @@ class BuildEvent:
         stanza = BuildEvent._hashStanza(recipe)
         return BuildEvent(os.getcwd(), script, target, stanza)
 
-    nonsums = ['directory', 'missing', 'ignore']
+    nonsums = ['directory', 'ignore']
     header = ['directory', 'script', 'target', 'recipe', 'timestamp', 'result']
 
     def __init__(self, cwd, script, target, stanza, timestamp=None, checksum=None):
@@ -290,7 +290,7 @@ class Script:
                 if not bang:
                     raise BuildError('Missing first line "#!" in %s' % (path))
 
-                self.interpreter = bang.group(3).split()[1:] or ['/bin/sh', '-s']
+                self.interpreter = bang.group(3).split()[1:] or ['/bin/sh', '-se']
 
                 pattern, always, stanza, indent = None, False, '', None
 
