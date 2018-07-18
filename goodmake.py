@@ -149,9 +149,7 @@ class Info:
     def __init__(self, current):
         self.current = current
 
-        basename = path.basename(current.target) + '.gm'
-        if not basename.startswith('.'):
-            basename = '.' + basename
+        basename = '.' + path.basename(current.target) + '.gm'
 
         self.filename = path.join(path.dirname(current.target), basename)
 
