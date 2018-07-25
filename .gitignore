@@ -3,5 +3,6 @@
 .*.gm
 .gitignore
 /dist
-/Scratch.md
+/README.rst
+/version.txt
 __pycache__

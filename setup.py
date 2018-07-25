@@ -3,11 +3,12 @@
 """ Package information for goodmake. """
 
 from setuptools import setup
-import pypandoc
 
-from goodmake import theVersion
+with open("README.rst", "r") as fh:
+    theReadMe = fh.read()
 
-theReadMe = pypandoc.convert('README.md', 'rst')
+with open("version.txt", "r") as fh:
+    theVersion = fh.read()
 
 setup(
     name='goodmake',
@@ -22,6 +23,8 @@ setup(
     license="GPLv3",
     url='https://github.com/AmesCornish/GoodMake',
     keywords=['make', 'build', 'redo'],
+
+    python_requires='>=3.6',
 
     entry_points={
         'console_scripts': [

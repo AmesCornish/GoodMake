@@ -17,13 +17,30 @@
     rm -rf test/results dist goodmake.egg-info
     rm -f $(scripts/goodmake_clean.sh)
 
+#! test-pypi
+    opts="-r pypitest"
+
 #! pypi
-    ./setup.py sdist bdist_wheel upload
-    # ./setup.py sdist bdist_wheel upload -r pypitest
+    opts=
+
+#! pypi test-pypi
+    $0 README.rst version.txt
+    ./setup.py sdist bdist_wheel upload $opts
     ./setup.py clean --all
     rm -rf *.egg-info
 
+#? README.rst
+    pandoc --from markdown --to rst $readme >$1
+
+#? version.txt
+    $0 goodmake.py
+    python3 -c "import goodmake; print(goodmake.theVersion)" >$1
+
+#! test-install
+    sudo -H python3 -m pip install --upgrade --no-cache-dir --index-url https://test.pypi.org/simple/ goodmake
+
 #! dev-install
+    $0 README.rst version.txt
     ./setup.py bdist_wheel
     sudo ./setup.py install
     ./setup.py clean --all

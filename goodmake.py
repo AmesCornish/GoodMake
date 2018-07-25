@@ -23,7 +23,7 @@ import time
 
 logger = logging.getLogger()
 
-theVersion = '0.1.0'
+theVersion = '0.1.1.post3'
 
 theDepName = 'GM_FILE'
 theLogName = 'LOG'
