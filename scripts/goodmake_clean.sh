@@ -6,7 +6,7 @@
 RM="echo"  # just list deletable files
 
 # Don't delete anything newer than the current build
-CURRENT=mktemp
+CURRENT=$(mktemp)
 [ -z "$GM_STARTTIME" ] || touch -d "$GM_STARTTIME" "$CURRENT"
 
 find -name '.*.gm.lock' | while read REM; do
