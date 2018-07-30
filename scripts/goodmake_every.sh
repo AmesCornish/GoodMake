@@ -15,15 +15,15 @@
     [ $1 -nt $1.ago ] || date>$1
     rm $1.ago
 
-#! .os_install
+#! .os_install .install
     date -r /var/log/installer/syslog > $1
 
-#? !.reboot
+#? !.reboot !.boot
     $0 /dev/shm/reboot-timestamp
 
 #? /dev/shm/reboot-timestamp
     # /dev/shm is blown away every reboot
-    uptime=$(shell cut --fields 1 --delimiter ' ' < /proc/uptime)
+    uptime=$(cut --fields 1 --delimiter ' ' < /proc/uptime)
     date -d "${uptime} seconds ago" >$1
 
 ############################################

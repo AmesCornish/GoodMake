@@ -8,8 +8,8 @@
     cd test
     DIR=results
     ./suite.sh
-    git status --short ${DIR}
-    git diff --quiet ${DIR}
+    git status --short -- ${DIR}
+    git diff --quiet -- ${DIR}
     [ -z "$(git ls-files --other --directory --exclude-standard $DIR)" ]
     echo "TESTS PASSED"
 

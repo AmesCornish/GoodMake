@@ -8,6 +8,7 @@
     $0 results/parallel
     $0 results/errors
     $0 results/missing
+    $0 results/every
 
 ##############################################
 
@@ -19,7 +20,7 @@
     export GM_THREADS=1
     DIR=$(dirname $0)
 
-    rm -rf tgt src .sleep.gm* .ctlc.gm*
+    rm -rf tgt src
     cp -a dist src
 
     # Redirect all output to build target
@@ -72,13 +73,20 @@
     sort $1 > $1.tmp
     mv $1.tmp $1
 
+#? results/every
+    rm .?hour* .?os_install* .?boot*
+    every=../scripts/goodmake_every.sh
+    $0 $every
+    $every .hour
+    $every .boot
+    $every .os_install
+
 ##############################################
 
 #? results/*
     set +x
     sync $1
     sed -i --file results.sed $1
-    rm -rf tgt src
 
 ##############################################
 ##############################################

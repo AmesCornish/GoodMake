@@ -1,0 +1,17 @@
++ rm ..hour.gm ..os_install.gm ..boot.gm
++ every=../scripts/goodmake_every.sh
++ ./suite.sh ../scripts/goodmake_every.sh
+GoodMake version X.X.X
+Dependency ../scripts/goodmake_every.sh
++ ../scripts/goodmake_every.sh .hour
+GoodMake version X.X.X
+Run .hour because it hasn't completed
++ ../scripts/goodmake_every.sh .boot
+GoodMake version X.X.X
+Run .boot because it hasn't completed
+GoodMake version X.X.X
+Skip /dev/shm/reboot-timestamp because dependencies unchanged
++ ../scripts/goodmake_every.sh .os_install
+GoodMake version X.X.X
+Run .os_install because it hasn't completed
++ set +x
