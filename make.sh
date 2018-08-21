@@ -45,3 +45,10 @@
     sudo ./setup.py install
     ./setup.py clean --all
     rm -rf *.egg-info
+
+#? .completion
+    src=scripts/bash_completion.sh
+    tgt=/etc/bash_completion.d/goodmake
+    $0 $src
+    sudo cp $src $tgt
+    ln -sf $tgt $1

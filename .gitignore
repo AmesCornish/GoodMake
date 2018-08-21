@@ -1,7 +1,7 @@
 *.pyc
 *.sublime-workspace
 .*.gm
-.gitignore
+/.completion
 /dist
 /README.rst
 /version.txt
