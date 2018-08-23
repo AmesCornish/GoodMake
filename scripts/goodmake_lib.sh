@@ -1,11 +1,12 @@
 # Useful varibles and functions for goodmake builds
 
-gm="$(readlink --canonicalize $0)"
-gm_dir="$(dirname $gm)"
-gm_name="$(basename $0)"
+make="$(readlink --canonicalize $0)"
+make_dir="$(dirname $make)"
+make_name="$(basename $0)"
+make_every="$(which goodmake_every.sh)"
 
 # Execute a command in the script directory, instead of PWD.
-gm_global() { cd "$gm_dir"; $gm "$@"; cd -; }
+make_global() { cd "$make_dir"; $make "$@"; cd -; }
 
 # Echo the command before executing
-gm_log() { echo "+" "$@"; "$@"; }
+make_log() { echo "+" "$@"; "$@"; }
