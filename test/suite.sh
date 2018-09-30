@@ -74,7 +74,7 @@
     mv $1.tmp $1
 
 #? results/every
-    rm .?hour* .?os_install* .?boot*
+    rm -f .?hour* .?os_install* .?boot* /dev/shm/.reboot-timestamp*
     every=../scripts/goodmake_every.sh
     $0 $every
     $every .hour
