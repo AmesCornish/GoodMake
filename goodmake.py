@@ -23,7 +23,7 @@ import time
 
 logger = logging.getLogger()
 
-theVersion = '0.1.2'
+theVersion = '0.1.3'
 
 theDepName = 'GM_FILE'
 theLogName = 'LOG'
@@ -55,6 +55,17 @@ def str2date(timestamp):
     if timestamp == 'now':
         return datetime.datetime.now()
     return datetime.datetime.strptime(timestamp, theDateFormat)
+
+
+def hashString(str):
+    return hashBuffers([str.encode('utf-8')])
+
+
+def hashBuffers(buffers):
+    d = hashlib.md5()
+    for buf in buffers:
+        d.update(buf)
+    return d.hexdigest()
 
 
 @contextmanager
@@ -114,9 +125,7 @@ class BuildEvent:
         elif not recipe.script:
             return 'empty'
 
-        d = hashlib.md5()
-        d.update(recipe.script.encode('utf-8'))
-        return d.hexdigest()
+        return hashString(recipe.script)
 
     @staticmethod
     def _hashFile(target):
@@ -130,11 +139,7 @@ class BuildEvent:
             return 'empty'
 
         with open(target, mode='rb') as f:
-            d = hashlib.md5()
-            for buf in iter(partial(f.read, 4096), b''):
-                d.update(buf)
-
-        return d.hexdigest()
+            return hashBuffers(iter(partial(f.read, 4096), b''))
 
 
 class Info:
@@ -146,10 +151,13 @@ class Info:
 
     Also is a context manager to hold lock on info file. """
 
-    def __init__(self, current):
+    def __init__(self, current, fakeTarget=False):
         self.current = current
 
-        basename = '.' + path.basename(current.target) + '.gm'
+        basename = '.' + path.basename(current.target)
+        if fakeTarget:
+            basename += '_' + hashString(path.abspath(current.script))
+        basename += '.gm'
 
         self.filename = path.join(path.dirname(current.target), basename)
 
@@ -406,7 +414,7 @@ class Builder:
 
         current.timestamp = date2str(self.timestamp)
 
-        with Info(current) as info:
+        with Info(current, recipe.ignore) as info:
             isOK, reason = self._check(info, recipe)
 
             if isOK:

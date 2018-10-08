@@ -1,5 +1,8 @@
 #! ../goodmake.py /bin/sh -se
 
+#? !default
+    echo "Default no-op"
+
 #? tgt/sorted.txt
     $0 src/input.txt
     sort src/input.txt > "$1"

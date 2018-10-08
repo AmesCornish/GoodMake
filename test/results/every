@@ -1,4 +1,4 @@
-+ rm -f ..hour.gm ..os_install.gm ..boot.gm /dev/shm/.reboot-timestamp.gm
++ rm -f ..hour.gm ..os_install.gm ..boot_3589025e6d466aed55cfe9fa0ac72026.gm /dev/shm/.reboot-timestamp.gm
 + every=../scripts/goodmake_every.sh
 + ./suite.sh ../scripts/goodmake_every.sh
 GoodMake version X.X.X

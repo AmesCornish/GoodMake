@@ -2,7 +2,7 @@
 
 
 # Default action is to sort all files in src directory
-#? default
+#? !default
     $0 all
 
 # Make a target file by sorting a source file

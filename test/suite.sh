@@ -9,6 +9,7 @@
     $0 results/errors
     $0 results/missing
     $0 results/every
+    $0 results/default
 
 ##############################################
 
@@ -80,6 +81,9 @@
     $every .hour
     $every .boot
     $every .os_install
+
+#? results/default
+    $DIR/make.sh default
 
 ##############################################
 

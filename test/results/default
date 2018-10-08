@@ -1,0 +1,4 @@
++ ./make.sh default
+GoodMake version X.X.X
+Skip default because dependencies unchanged
++ set +x
