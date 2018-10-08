@@ -154,6 +154,7 @@ class Info:
     def __init__(self, current, fakeTarget=False):
         self.current = current
 
+        # This lets two different scripts use the same fake target (e.g. !default)
         basename = '.' + path.basename(current.target)
         if fakeTarget:
             basename += '_' + hashString(path.abspath(current.script))
@@ -197,6 +198,12 @@ class Info:
         self.deps = self.deps[:-1]
         self.timestamp = datetime.datetime.fromtimestamp(path.getmtime(self.filename))
         logger.debug('Read %s: %s', self.filename, self.timestamp)
+
+        if self.last and self.last.script != self.current.script:
+            raise BuildError(
+                '%s is trying to re-use %s created by %s' %
+                (self.current.script, self.filename, self.last.script)
+            )
 
     def __enter__(self):
         lockdir = path.dirname(self._lockname)

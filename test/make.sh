@@ -26,3 +26,9 @@
 
 #? circular-b
     $0 circular-a
+
+#? tgt/conflict
+    echo $0>$1
+
+#? !tgt/fake
+    echo $0>$1

@@ -1,0 +1,9 @@
++ ./make.sh conflict
+GoodMake version X.X.X
+Run conflict because it hasn't completed
++ ./suite.sh conflict
+GoodMake version X.X.X
+./suite.sh is trying to re-use .conflict.gm created by ./make.sh
++ echo Error# 1
+Error# 1
++ set +x

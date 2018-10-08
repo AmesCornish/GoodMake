@@ -9,7 +9,8 @@
     $0 results/errors
     $0 results/missing
     $0 results/every
-    $0 results/default
+    $0 results/fake
+    $0 results/conflict
 
 ##############################################
 
@@ -82,8 +83,21 @@
     $every .boot
     $every .os_install
 
-#? results/default
-    $DIR/make.sh default
+#? results/fake
+    # Two different scripts should both be able to make !fake
+    $DIR/make.sh fake
+    $0 fake
+
+#? !tgt/fake
+    echo $0>$1
+
+#? results/conflict
+    # Two different scripts both creating 'conflict' should produce error
+    $DIR/make.sh conflict
+    $0 conflict || echo "Error#" $?
+
+#? tgt/conflict
+    echo $0>$1
 
 ##############################################
 
