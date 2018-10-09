@@ -23,7 +23,7 @@ import time
 
 logger = logging.getLogger()
 
-theVersion = '0.1.3'
+theVersion = '0.1.4'
 
 theDepName = 'GM_FILE'
 theLogName = 'LOG'
@@ -118,6 +118,9 @@ class BuildEvent:
             self.checksum or '',
         ])
 
+    def fullScriptPath(self):
+        return path.normpath(path.join(self.dir, self.script))
+
     @staticmethod
     def _hashStanza(recipe):
         if recipe.script is None:
@@ -157,7 +160,7 @@ class Info:
         # This lets two different scripts use the same fake target (e.g. !default)
         basename = '.' + path.basename(current.target)
         if fakeTarget:
-            basename += '_' + hashString(path.abspath(current.script))
+            basename += '_' + hashString(current.fullScriptPath())
         basename += '.gm'
 
         self.filename = path.join(path.dirname(current.target), basename)
@@ -199,10 +202,10 @@ class Info:
         self.timestamp = datetime.datetime.fromtimestamp(path.getmtime(self.filename))
         logger.debug('Read %s: %s', self.filename, self.timestamp)
 
-        if self.last and self.last.script != self.current.script:
+        if self.last and self.last.fullScriptPath() != self.current.fullScriptPath():
             raise BuildError(
-                '%s is trying to re-use %s created by %s' %
-                (self.current.script, self.filename, self.last.script)
+                '%s is trying to re-use %s created by %s.  Deleting.' %
+                (self.current.fullScriptPath(), self.filename, self.last.fullScriptPath())
             )
 
     def __enter__(self):
@@ -424,13 +427,12 @@ class Builder:
         with Info(current, recipe.ignore) as info:
             isOK, reason = self._check(info, recipe)
 
+            if reason:
+                logger.warn('%s %s from %s because %s', 'Skip' if isOK else 'Run', target, current.script, reason)
+
             if isOK:
-                if reason:
-                    logger.info('Skip %s because %s', target, reason)
                 # This uses checksum from last build
                 return info.last
-
-            logger.warn('Run %s because %s', target, reason)
 
             with info.build():
                 # This also updates info.current.checksum
