@@ -3,8 +3,8 @@ ERROR
 Error# 2
 + export GM_THREADS=8
 GoodMake version X.X.X
+Make error from ./make.sh because it hasn't completed
 ./make.sh error (with /bin/sh -se) returned 2
 + ./make.sh sleep sleep sleep error
-Run error because it hasn't completed
-Run sleep because it hasn't completed
+Make sleep from ./make.sh because it hasn't completed
 + sort results/errors

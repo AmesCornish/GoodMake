@@ -1,6 +1,6 @@
 + ./make.sh no_recipe
 GoodMake version X.X.X
-Run no_recipe because it hasn't completed
+Make no_recipe from ./make.sh because it hasn't completed
 No recipe for no_recipe
 + echo Error # 1
 Error # 1

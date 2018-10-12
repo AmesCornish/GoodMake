@@ -11,6 +11,7 @@
     $0 results/every
     $0 results/fake
     $0 results/conflict
+    rm -rf tgt src
 
 ##############################################
 
@@ -76,7 +77,7 @@
     mv $1.tmp $1
 
 #? results/every
-    rm -f .?hour* .?os_install* .?boot* /dev/shm/.reboot-timestamp*
+    rm -f .?hour* .?os_install* .?boot* /dev/shm/.reboot-timestamp.gm
     every=../scripts/goodmake_every.sh
     $0 $every
     $every .hour
@@ -85,16 +86,16 @@
 
 #? results/fake
     # Two different scripts should both be able to make !fake
-    $DIR/make.sh fake
-    $0 fake
+    $DIR/make.sh tgt/fake
+    $0 tgt/fake
 
 #? !tgt/fake
     echo $0>$1
 
 #? results/conflict
     # Two different scripts both creating 'conflict' should produce error
-    $DIR/make.sh conflict
-    $0 conflict || echo "Error#" $?
+    $DIR/make.sh tgt/conflict
+    $0 tgt/conflict || echo "Error#" $?
 
 #? tgt/conflict
     echo $0>$1

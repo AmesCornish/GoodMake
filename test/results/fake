@@ -1,7 +1,7 @@
-+ ./make.sh fake
++ ./make.sh tgt/fake
 GoodMake version X.X.X
-Run fake because it hasn't completed
-+ ./suite.sh fake
+Make tgt/fake from ./make.sh because it hasn't completed
++ ./suite.sh tgt/fake
 GoodMake version X.X.X
-Run fake because it hasn't completed
+Make tgt/fake from ./suite.sh because it hasn't completed
 + set +x

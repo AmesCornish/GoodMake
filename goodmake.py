@@ -427,12 +427,15 @@ class Builder:
         with Info(current, recipe.ignore) as info:
             isOK, reason = self._check(info, recipe)
 
-            if reason:
-                logger.warn('%s %s from %s because %s', 'Skip' if isOK else 'Run', target, current.script, reason)
+            def log(level, action):
+                logger.log(level, '%s %s from %s because %s', action, target, current.script, reason)
 
             if isOK:
+                log(logging.INFO, 'Skip')
                 # This uses checksum from last build
                 return info.last
+            else:
+                log(logging.INFO if recipe.always else logging.WARN, 'Make')
 
             with info.build():
                 # This also updates info.current.checksum
