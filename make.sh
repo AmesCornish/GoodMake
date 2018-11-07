@@ -1,5 +1,8 @@
 #! goodmake.py /bin/sh -se
 
+#! default
+    $0 test version.txt
+
 #! retest
     rm -rf test/results .test.gm
     $0 test
