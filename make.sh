@@ -1,9 +1,9 @@
 #! goodmake.py /bin/sh -se
 
-#! default
-    $0 test version.txt
+#? !default
+    $0 test lint version.txt
 
-#! retest
+#! !retest
     rm -rf test/results .test.gm
     $0 test
 
@@ -16,14 +16,17 @@
     [ -z "$(git ls-files --other --directory --exclude-standard $DIR)" ]
     echo "TESTS PASSED"
 
-#! clean
+#? !lint
+    MYPYPATH=./stubs mypy goodmake.py
+
+#! !clean
     rm -rf test/results dist goodmake.egg-info
     rm -f $(scripts/goodmake_clean.sh)
 
-#! test-pypi
+#! !test-pypi
     opts="-r pypitest"
 
-#! pypi
+#! !pypi
     opts=
 
 #! pypi test-pypi

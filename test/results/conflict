@@ -3,7 +3,7 @@ GoodMake version X.X.X
 Make tgt/conflict from ./make.sh because it hasn't completed
 + ./suite.sh tgt/conflict
 GoodMake version X.X.X
-/home/ames/Projects/goodmake/test/suite.sh is trying to re-use tgt/.conflict.gm created by /home/ames/Projects/goodmake/test/make.sh.  Deleting.
+/home/ames/Projects/goodmake/test/suite.sh is trying to re-use /home/ames/Projects/goodmake/test/tgt/.conflict.gm created by /home/ames/Projects/goodmake/test/make.sh.  Deleting.
 + echo Error# 1
 Error# 1
 + set +x

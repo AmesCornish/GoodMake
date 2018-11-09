@@ -1,6 +1,7 @@
 *.pyc
 *.sublime-workspace
 .*.gm
+.mypy_cache
 /.completion
 /dist
 /README.rst
