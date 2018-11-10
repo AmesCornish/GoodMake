@@ -23,6 +23,7 @@
     export GM_THREADS=1
     DIR=$(dirname $0)
 
+    rm -f .?all* .?hour* .?os_install* .?boot* /dev/shm/.reboot-timestamp.gm
     rm -rf tgt src
     cp -a dist src
 
@@ -76,7 +77,6 @@
     mv $1.tmp $1
 
 #? results/every
-    rm -f .?hour* .?os_install* .?boot* /dev/shm/.reboot-timestamp.gm
     every=../scripts/goodmake_every.sh
     $0 $every
     $every .hour

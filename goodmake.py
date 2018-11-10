@@ -63,19 +63,6 @@ Hash = str
 Seconds = float
 ShellCommand = List[str]
 
-def str2path(text: str, dirPath: FullPath) -> FullPath:
-    return path.normpath(path.join(dirPath, text))
-
-def path2str(dirPath: FullPath, fullPath: FullPath) -> str:
-    """ Makes a pretty relative string. """
-    relPath = path.relpath(fullPath, dirPath)
-    if len(relPath) > len(fullPath):
-        relPath = fullPath
-    if relPath == path.basename(fullPath):
-        relPath = './' + relPath
-    return relPath
-
-
 ###########################################
 
 # Rough maximum wait for goodmake file locks, in seconds
@@ -103,6 +90,20 @@ def str2date(timestamp: str) -> datetime:
     return datetime.strptime(timestamp, theDateFormat)
 
 
+def str2path(text: str, dirPath: FullPath) -> FullPath:
+    return path.normpath(path.join(dirPath, text))
+
+
+def path2str(dirPath: FullPath, fullPath: FullPath) -> str:
+    """ Makes a pretty relative string. """
+    relPath = path.relpath(fullPath, dirPath)
+    if len(relPath) > len(fullPath):
+        relPath = fullPath
+    if relPath == path.basename(fullPath):
+        relPath = './' + relPath
+    return relPath
+
+
 def hashString(str: str) -> Hash:
     return hashBuffers([str.encode('utf-8')])
 
@@ -120,6 +121,21 @@ class BuildError(Exception):
         self.returncode = returncode
 
 
+class BuildCommand:
+    def __init__(self, dirPath: FullPath, scriptPath: str, targetPath: str):
+        self.dirPath = dirPath
+        self.script = scriptPath
+        self.target = targetPath
+
+    @property
+    def scriptPath(self) -> FullPath:
+        return str2path(self.script, self.dirPath)
+
+    @property
+    def targetPath(self) -> FullPath:
+        return str2path(self.target, self.dirPath)
+
+
 class Recipe:
     def __init__(self, interpreter: ShellCommand, script: Optional[str], always: bool, ignore: bool):
         self.interpreter = interpreter
@@ -127,25 +143,25 @@ class Recipe:
         self.always = always
         self.ignore = ignore
 
-    def run(recipe, dirPath: FullPath, scriptPath: str, targetPath: str, vars: dict) -> None:
+    def run(recipe, command: BuildCommand, vars: dict) -> None:
         if recipe.script is None:
-            raise BuildError("No recipe for " + targetPath)
+            raise BuildError("No recipe for " + command.target)
 
         env = os.environ.copy()
         env.update(vars)
 
         description = '%s %s (with %s)' % (
-            scriptPath, targetPath, ' '.join(recipe.interpreter)
+            command.script, command.target, ' '.join(recipe.interpreter)
         )
 
         logger.debug('Running %s', description)
 
         process = subprocess.Popen(
-            [scriptPath] + recipe.interpreter[1:] + [targetPath, scriptPath],
+            [command.script] + recipe.interpreter[1:] + [command.target, command.script],
             executable=recipe.interpreter[0],
             stdin=subprocess.PIPE,
             env=env,
-            cwd=dirPath,
+            cwd=command.dirPath,
         )
 
         try:
@@ -165,38 +181,31 @@ class Recipe:
             )
 
 
-class BuildEvent:
+class BuildEvent(BuildCommand):
 
     @staticmethod
     def fromString(line: str) -> 'BuildEvent':
         args = line.rstrip().split('\t')
         if not args[0].startswith('/'):
             raise BuildError('Directory name is not absolute path in "%s"' % line)
-        return BuildEvent(
-            cast(FullPath, args[0]),
-            *args[1:]
-            )
+        return BuildEvent(BuildCommand(cast(FullPath, args[0]), *args[1:3]), *args[3:])
 
     @staticmethod
-    def fromRecipe(dirPath: FullPath, script: str, target: str, recipe: Recipe) -> 'BuildEvent':
+    def fromRecipe(command: BuildCommand, recipe: Recipe) -> 'BuildEvent':
         stanza = BuildEvent._hashStanza(recipe)
-        return BuildEvent(dirPath, script, target, stanza)
+        return BuildEvent(command, stanza)
 
     nonsums = ['directory', 'ignore']
     header = ['directory', 'script', 'target', 'recipe', 'timestamp', 'result']
 
     def __init__(
         self,
-        cwd: FullPath,
-        script: str,
-        target: str,
+        command: BuildCommand,
         stanza: Hash,
         timestamp: str = None,
         checksum: Hash = None
     ):
-        self.dirPath = cwd
-        self.script = script
-        self.target = target
+        super(BuildEvent, self).__init__(command.dirPath, command.script, command.target)
         self.stanza = stanza
         self.timestamp = timestamp
         self.checksum = checksum
@@ -205,7 +214,7 @@ class BuildEvent:
         self.timestamp = date2str(timestamp)
         self.checksum = (
             'ignore' if ignoreChecksum
-            else self._hashFile(str2path(self.target, self.dirPath))
+            else self._hashFile(self.targetPath)
         )
 
     def __str__(self) -> str:
@@ -217,9 +226,6 @@ class BuildEvent:
             self.timestamp or '',
             self.checksum or '',
         ])
-
-    def fullScriptPath(self) -> FullPath:
-        return str2path(self.script, self.dirPath, )
 
     @staticmethod
     def _hashStanza(recipe: Recipe) -> Hash:
@@ -257,13 +263,13 @@ class Info:
     def __init__(self, current: BuildEvent, fakeTarget: bool = False):
         self.current = current
 
-        # This lets two different scripts use the same fake target (e.g. !default)
         basename = '.' + path.basename(current.target)
         if fakeTarget:
-            basename += '_' + hashString(current.fullScriptPath())
+            # This lets two different scripts use the same fake target (e.g. !default)
+            basename += '_' + hashString(current.scriptPath)
         basename += '.gm'
 
-        targetDir = path.dirname(str2path(current.target, current.dirPath))
+        targetDir = path.dirname(current.targetPath)
         self.filename: FullPath = str2path(basename, targetDir)
 
         self._lockname = cast(FullPath, self.filename + '.lock')
@@ -303,10 +309,10 @@ class Info:
         self.timestamp = datetime.fromtimestamp(path.getmtime(self.filename))
         logger.debug('Read %s: %s', self.filename, self.timestamp)
 
-        if self.last and self.last.fullScriptPath() != self.current.fullScriptPath():
+        if self.last and self.last.scriptPath != self.current.scriptPath:
             raise BuildError(
                 '%s is trying to re-use %s created by %s.  Deleting.' %
-                (self.current.fullScriptPath(), self.filename, self.last.fullScriptPath())
+                (self.current.scriptPath, self.filename, self.last.scriptPath)
             )
 
     def __enter__(self) -> 'Info':
@@ -458,18 +464,18 @@ class Builder:
         self._scripts: Dict[FullPath, Script] = {}
         self._scriptLock = threading.Lock()
 
-    def build(self, dirPath: FullPath, script: str, target: str) -> BuildEvent:
+    def build(self, command: BuildCommand) -> BuildEvent:
         """ Build <target> with <script> from current directory if it needs updating.
 
         Returns BuildEvent for target.
         """
-        recipe = self._getScript(dirPath, script, target)
-        current = BuildEvent.fromRecipe(dirPath, script, target, recipe)
+        recipe = self._getRecipe(command)
+        current = BuildEvent.fromRecipe(command, recipe)
 
         logger.debug('Checking %s', current)
 
-        if current.stanza == 'missing' and path.exists(str2path(target, dirPath)):
-            logger.info('Dependency %s', target)
+        if current.stanza == 'missing' and path.exists(command.targetPath):
+            logger.info('Dependency %s', command.target)
             current.refresh(None, False)
             return current
 
@@ -479,7 +485,7 @@ class Builder:
             isOK, reason = self._check(info, recipe)
 
             def log(level: int, action: str) -> None:
-                logger.log(level, '%s %s from %s because %s', action, target, current.script, reason)
+                logger.log(level, '%s %s from %s because %s', action, command.target, current.script, reason)
 
             if isOK and info.last:
                 log(logging.INFO, 'Skip')
@@ -494,7 +500,7 @@ class Builder:
                     theTimestampName: date2str(self.timestamp),
                     theDepName: path.realpath(info.filename),
                 }
-                recipe.run(dirPath, script, target, envVars)
+                recipe.run(command, envVars)
                 info.current.refresh(self.timestamp, recipe.ignore)
 
             return info.current
@@ -526,7 +532,7 @@ class Builder:
 
         for dep in info.deps:
             try:
-                updatedDep = self.build(dep.dirPath, dep.script, dep.target)
+                updatedDep = self.build(dep)
             except BuildError as e:
                 return False, dep.target + ' raised error "' + str(e) + '"'
 
@@ -543,9 +549,9 @@ class Builder:
         info.checked()
         return True, 'dependencies unchanged'
 
-    def _getScript(self, dirPath: FullPath, script: str, target: str) -> Recipe:
+    def _getRecipe(self, command: BuildCommand) -> Recipe:
         # Get an absolute, canonical path
-        scriptPath = path.realpath(str2path(script, dirPath))
+        scriptPath = path.realpath(command.scriptPath)
 
         with self._scriptLock:
             if scriptPath not in self._scripts:
@@ -553,7 +559,7 @@ class Builder:
 
         scripts = self._scripts[scriptPath]
 
-        return scripts.match(target)
+        return scripts.match(command.target)
 
 
 def main(argv: List[str] = sys.argv) -> int:
@@ -578,7 +584,8 @@ def main(argv: List[str] = sys.argv) -> int:
         if Builder.error:
             return
         try:
-            event = builder.build(currentDir, scriptPath, target)
+            command = BuildCommand(currentDir, scriptPath, target)
+            event = builder.build(command)
 
             if depPath:
                 logger.debug('Writing %s to parent %s', target, depPath)

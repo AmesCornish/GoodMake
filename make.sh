@@ -7,7 +7,7 @@
     rm -rf test/results .test.gm
     $0 test
 
-#? !test
+#! !test
     cd test
     DIR=results
     ./suite.sh
@@ -17,6 +17,7 @@
     echo "TESTS PASSED"
 
 #? !lint
+    $0 goodmake.py mypy.ini
     MYPYPATH=./stubs mypy goodmake.py
 
 #! !clean
