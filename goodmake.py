@@ -13,19 +13,7 @@ from datetime import datetime, timedelta
 from enum import Enum
 from functools import partial
 from random import random
-from typing import (
-    Any,
-    cast,
-    Dict,
-    Generator,
-    Iterable,
-    List,
-    Match,
-    NewType,
-    Optional,
-    Pattern,
-    Tuple,
-)
+from typing import Any, cast, Dict, Generator, Iterable, List, Match, Optional, Tuple
 import fnmatch
 import hashlib
 import logging
@@ -39,7 +27,7 @@ import time
 
 logger = logging.getLogger()
 
-theVersion = '0.1.4'
+theVersion = '0.1.5'
 
 theDepName = 'GM_FILE'
 theLogName = 'LOG'
@@ -50,15 +38,11 @@ theThreadsName = 'GM_THREADS'
 
 ################ TYPES ####################
 
-# FullPath = getattr(path, 'FullPath', None)
 try:
     FullPath = path.FullPath
 except Exception:
     FullPath = None  # type: ignore  # Only for runtime
 
-# Path = NewType('Path', str)
-# FullPath = NewType('FullPath', Path)
-# RelPath = NewType('RelPath', Path)
 Hash = str
 Seconds = float
 ShellCommand = List[str]
@@ -67,6 +51,7 @@ ShellCommand = List[str]
 
 # Rough maximum wait for goodmake file locks, in seconds
 theLockWait: Seconds = int(os.environ.get(theTimeoutName, 60))
+
 # Number of retries during wait
 theLockTries = 10
 
@@ -77,6 +62,8 @@ theLogFormat = '%(message)s'
 theStampAccuracy = timedelta(0, 0, 10000)
 
 theMaxThreads = int(os.environ.get(theThreadsName, 8))
+
+###########################################
 
 def date2str(timestamp: datetime = None) -> str:
     if timestamp is None:
@@ -112,6 +99,8 @@ def hashBuffers(buffers: Iterable[bytes]) -> Hash:
         d.update(buf)
     return d.hexdigest()
 
+
+###########################################
 
 class BuildError(Exception):
     def __init__(self, message: str, returncode: int = 1):
@@ -569,7 +558,7 @@ def main(argv: List[str] = sys.argv) -> int:
     # interpreter = argv[1]  # interpreter will be taken from the file shebang
     scriptPath = argv[2]
     targetPaths = argv[3:] or ['default']
-    depPath = os.environ.get(theDepName, None)
+    depPath = cast(Optional[FullPath], os.environ.get(theDepName, None))
     currentDir = os.getcwd()
 
     logger.debug('PID %s:%s for %s', os.getpid(), os.getppid(), targetPaths)

@@ -11,7 +11,6 @@
     $0 results/every
     $0 results/fake
     $0 results/conflict
-    rm -rf tgt src
 
 ##############################################
 
@@ -105,6 +104,7 @@
     set +x
     sync $1
     sed -i --file results.sed $1
+    rm -rf tgt src
 
 ##############################################
 ##############################################

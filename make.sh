@@ -4,10 +4,10 @@
     $0 test lint version.txt
 
 #! !retest
-    rm -rf test/results .test.gm
+    rm -rf test/results .test_*.gm
     $0 test
 
-#! !test
+#? !test
     cd test
     DIR=results
     ./suite.sh
@@ -42,6 +42,9 @@
 #? version.txt
     $0 goodmake.py
     python3 -c "import goodmake; print(goodmake.theVersion)" >$1
+
+#! install
+    sudo -H python3 -m pip install --upgrade --no-cache-dir goodmake
 
 #! test-install
     sudo -H python3 -m pip install --upgrade --no-cache-dir --index-url https://test.pypi.org/simple/ goodmake
