@@ -94,13 +94,11 @@ def str2path(text: str, dirPath: FullPath) -> FullPath:
     return path.normpath(path.join(dirPath, text))
 
 
-def path2str(dirPath: FullPath, fullPath: FullPath) -> str:
+def path2str(fullPath: FullPath, dirPath: FullPath) -> str:
     """ Makes a pretty relative string. """
     relPath = path.relpath(fullPath, dirPath)
     if len(relPath) > len(fullPath):
         relPath = fullPath
-    if relPath == path.basename(fullPath):
-        relPath = './' + relPath
     return relPath
 
 
@@ -184,11 +182,9 @@ class Recipe:
 class BuildEvent(BuildCommand):
 
     @staticmethod
-    def fromString(line: str) -> 'BuildEvent':
+    def fromString(line: str, dirPath: FullPath) -> 'BuildEvent':
         args = line.rstrip().split('\t')
-        if not args[0].startswith('/'):
-            raise BuildError('Directory name is not absolute path in "%s"' % line)
-        return BuildEvent(BuildCommand(cast(FullPath, args[0]), *args[1:3]), *args[3:])
+        return BuildEvent(BuildCommand(str2path(args[0], dirPath), *args[1:3]), *args[3:])
 
     @staticmethod
     def fromRecipe(command: BuildCommand, recipe: Recipe) -> 'BuildEvent':
@@ -217,9 +213,9 @@ class BuildEvent(BuildCommand):
             else self._hashFile(self.targetPath)
         )
 
-    def __str__(self) -> str:
+    def toString(self, dirPath: FullPath) -> str:
         return '\t'.join([
-            self.dirPath,
+            path2str(self.dirPath, dirPath),
             self.script,
             self.target,
             self.stanza,
@@ -269,8 +265,8 @@ class Info:
             basename += '_' + hashString(current.scriptPath)
         basename += '.gm'
 
-        targetDir = path.dirname(current.targetPath)
-        self.filename: FullPath = str2path(basename, targetDir)
+        self.targetDir = path.dirname(current.targetPath)
+        self.filename: FullPath = str2path(basename, self.targetDir)
 
         self._lockname = cast(FullPath, self.filename + '.lock')
 
@@ -291,7 +287,7 @@ class Info:
         # write final header to target
         logger.debug('Writing %s to %s', self.current.target, self.filename)
         with open(self.filename, 'a') as file:
-            file.write(str(self.current) + '\n')
+            file.write(self.current.toString(self.targetDir) + '\n')
 
     def checked(self) -> None:
         os.utime(self.filename)
@@ -303,7 +299,7 @@ class Info:
         with open(self.filename, 'r') as info:
             next(info)  # Header
             for line in info:
-                self.deps.append(BuildEvent.fromString(line))
+                self.deps.append(BuildEvent.fromString(line, self.targetDir))
         self.last = self.deps[-1] if len(self.deps) > 0 else None
         self.deps = self.deps[:-1]
         self.timestamp = datetime.fromtimestamp(path.getmtime(self.filename))
@@ -590,7 +586,7 @@ def main(argv: List[str] = sys.argv) -> int:
             if depPath:
                 logger.debug('Writing %s to parent %s', target, depPath)
                 with open(depPath, 'a') as file:
-                    file.write(str(event) + '\n')
+                    file.write(event.toString(path.dirname(depPath)) + '\n')
         except Exception as e:
             logger.debug("Setting %s thread error %s", os.getpid(), e)
             Builder.error = e
