@@ -16,14 +16,17 @@
 
 #? results/*
     $0 ../goodmake.py
+
     unset GM_STARTTIME
     unset GM_FILE
     export LOG=INFO
     export GM_THREADS=1
     DIR=$(dirname $0)
+    # DIR=$(readlink --canonicalize $(dirname $0))
 
-    rm -f .?all* .?hour* .?os_install* .?boot* /dev/shm/.reboot-timestamp.gm
-    rm -rf tgt src
+    CLEAN=$(ls .*.gm | grep -v '^.default' || true)
+    rm -rf src $CLEAN tgt.ls
+    rm -f  /dev/shm/reboot-timestamp  /dev/shm/.reboot-timestamp.gm
     cp -a dist src
 
     # Redirect all output to build target
