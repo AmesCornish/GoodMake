@@ -88,9 +88,9 @@ To sort all the files, you'd simply type:
 This will sort all the files in the directory `src`, and put the sorted results in `tgt`.  The `$0` variable is the make script `./make.sh`, and the `$1` variable is the target currently being built.  The build works as follows:
 
 1. The `./make.sh` script with no arguments runs the recipe for `default`
-2. The `default` recipe requires `doclist`, which lists the files in `src` into a file called `doclist`.  If new files are added to `src`, the `doclist` will change, causing the `default` recipe to re-run.
-3. Next, the `default` recipe requires corresponding `tgt/filename` dependencies for each `src/filename` from the `doclist`.  If any of these `src` files have changed, the corresponding `tgt/*` pattern recipe will be run.
-4. A `tgt/filename` requirement uses the `tgt/*` recipe to create by running `sort` on the corresponding `src` file.
+2. The `default` recipe requires `all`, which requires `tgt.ls`, which lists the files in `src` into a file called `tgt.ls`.  If new files are added to `src`, the `tgt.ls` will change, causing the `all` recipe to re-run.
+3. Next, the `all` recipe requires corresponding `tgt/filename` dependencies for each `src/filename` from the `tgt.ls`.  If any of these `src` files have changed, the corresponding `tgt/*` pattern recipe will be re-run.
+4. A `tgt/filename` requirement uses the `tgt/*` recipe to create the target by running `sort` on the corresponding `src` file.
 
 If you want to create or update just one sorted file, you could type:
 

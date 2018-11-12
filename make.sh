@@ -37,6 +37,8 @@
     rm -rf *.egg-info
 
 #? README.rst
+    readme=README.md
+    $0 $readme
     pandoc --from markdown --to rst $readme >$1
 
 #? version.txt
