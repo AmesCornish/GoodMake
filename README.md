@@ -40,7 +40,7 @@ GoodMake:
 Usage
 =====
 
-Here's a moderately sophisticated and heavily-commented shell-script "make.sh" file, which contains 5 recipes:
+Here's a moderately sophisticated and heavily-commented shell-script executable "make.sh" file, which contains 5 recipes:
 
     #! /usr/local/bin/goodmake /bin/sh -sex
     
@@ -96,10 +96,12 @@ If you want to create or update just one sorted file, you could type:
 
     ./make.sh tgt/filename
 
-GoodMake script file syntax
-=========================
-    
-The first line is the OS "shebang" that says this should be executed with
+Goodmake Script File Syntax
+===========================
+
+A GoodMake script file is a file in a scripting language of your choice, along with strategically placed comments that break the file up into "recipes" to be run depending on the build target.  You'll typically want to make the GoodMake file executable.
+
+The familiar first comment line is the OS "shebang" that says this should be executed with
 GoodMake.  The line points to goodmake, and specifies an interpreter command.  Here is a Python shebang:
 
     #! /usr/local/bin/goodmake /usr/bin/python3 -
@@ -147,7 +149,7 @@ Here's a full python `make.py` script file example:
     #! !sayhi
         print("Hello, World")
 
-When recipes are run
+When Recipes Are Run
 ====================
 
 When an recipe is run, it may update the target, it creates a checksum, and it logs a build.  A recipe is run when one of its target patterns is requested, and:
@@ -158,7 +160,7 @@ When an recipe is run, it may update the target, it creates a checksum, and it l
 - The recipe has changed, or
 - if any known dependencies have changed
 
-When targets are considered changed
+When Targets Are Considered Changed
 ===================================
 
 A checksum is taken on dependency targets that are existing files.  Targets that are missing, or are directories, or whose patterns started with "!", don't have checksums.  A target is considered changed if:
@@ -173,7 +175,7 @@ Parallel Builds
 
 If a script is called with multiple dependencies, then these dependencies are checked (and rebuilt if necessary) in parallel, in batches of up to 8 at a time.  The parallelism can be specified with the GM_THREADS environment variable.
 
-What to clean
+What To Clean
 =============
 
 You may want to clean out all GoodMake files.  After such a clean, no files will have build logs, so all encountered recipes will be run when updating.  This is pretty safe.
