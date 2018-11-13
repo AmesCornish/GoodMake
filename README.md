@@ -32,10 +32,9 @@ Compared to Redo
 
 GoodMake:
 
-* Lets you use any scripting language for your recipes
-* Lets you consolidate multiple recipes into a single file
+* Does not require your make files to be in any particular place or have any particular name, so you can separate out your build code and your build targets.
+* Lets you consolidate multiple recipes into a single file, while still triggering rebuilds only for the specific recipes that changed
 * Lets you specify multiple target patterns that use the same recipe
-* Does not require your make files to be in any particular place
 
 Usage
 =====
